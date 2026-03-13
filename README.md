@@ -1,3 +1,3 @@
 # todo-list
 
-Initial repository for the todo-list project.
+Simple todo-list web app served by Node.js and prepared for xquare deployment.

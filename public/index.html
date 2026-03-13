@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Todo List</title>
+    <style>
+      :root {
+        font-family: "Segoe UI", sans-serif;
+        color: #f4efe7;
+        background:
+          radial-gradient(circle at top, rgba(214, 141, 74, 0.35), transparent 35%),
+          linear-gradient(160deg, #1c2430 0%, #11161d 100%);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+      }
+
+      .shell {
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+      }
+
+      .panel {
+        width: min(100%, 560px);
+        padding: 32px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 28px;
+        background: rgba(12, 15, 20, 0.72);
+        backdrop-filter: blur(18px);
+        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+      }
+
+      .eyebrow {
+        margin: 0 0 8px;
+        color: #f3b36b;
+        text-transform: uppercase;
+        letter-spacing: 0.2em;
+        font-size: 0.75rem;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(2.5rem, 8vw, 4rem);
+        line-height: 0.95;
+      }
+
+      .lede {
+        margin: 12px 0 24px;
+        color: rgba(244, 239, 231, 0.72);
+        line-height: 1.6;
+      }
+
+      .composer {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 12px;
+      }
+
+      .composer input {
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.04);
+        color: inherit;
+        padding: 14px 16px;
+      }
+
+      .composer button {
+        border: 0;
+        border-radius: 16px;
+        padding: 14px 18px;
+        background: #f3b36b;
+        color: #20170f;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .meta {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        margin: 20px 0 16px;
+        color: rgba(244, 239, 231, 0.72);
+        font-size: 0.95rem;
+      }
+
+      .list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        gap: 12px;
+      }
+
+      .task {
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 18px;
+        padding: 16px;
+        background: rgba(255, 255, 255, 0.04);
+      }
+
+      .task label {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .task input {
+        width: 18px;
+        height: 18px;
+      }
+
+      .task-done span {
+        text-decoration: line-through;
+        color: rgba(244, 239, 231, 0.48);
+      }
+
+      @media (max-width: 640px) {
+        .panel {
+          padding: 24px;
+        }
+
+        .composer {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <section class="panel">
+        <p class="eyebrow">Daily Focus</p>
+        <h1>Todo List</h1>
+        <p class="lede">
+          Minimal task board for quick planning, deployed with xquare.
+        </p>
+
+        <form class="composer" id="composer">
+          <input id="taskInput" aria-label="New task" placeholder="Add a task" />
+          <button type="submit">Add</button>
+        </form>
+
+        <div class="meta">
+          <span id="taskCount"></span>
+          <span id="doneCount"></span>
+        </div>
+
+        <ul class="list" id="taskList"></ul>
+      </section>
+    </main>
+
+    <script>
+      const state = {
+        tasks: [
+          { id: 1, title: "Define project scope", done: true },
+          { id: 2, title: "Create xquare project", done: true },
+          { id: 3, title: "Ship the first deployment", done: false }
+        ]
+      };
+
+      const composer = document.getElementById("composer");
+      const taskInput = document.getElementById("taskInput");
+      const taskList = document.getElementById("taskList");
+      const taskCount = document.getElementById("taskCount");
+      const doneCount = document.getElementById("doneCount");
+
+      function render() {
+        taskCount.textContent = `${state.tasks.length} tasks`;
+        doneCount.textContent =
+          `${state.tasks.filter((task) => task.done).length} completed`;
+
+        taskList.innerHTML = "";
+
+        state.tasks.forEach((task) => {
+          const item = document.createElement("li");
+          item.className = task.done ? "task task-done" : "task";
+
+          const label = document.createElement("label");
+          const checkbox = document.createElement("input");
+          const text = document.createElement("span");
+
+          checkbox.type = "checkbox";
+          checkbox.checked = task.done;
+          checkbox.addEventListener("change", () => {
+            task.done = !task.done;
+            render();
+          });
+
+          text.textContent = task.title;
+          label.append(checkbox, text);
+          item.append(label);
+          taskList.append(item);
+        });
+      }
+
+      composer.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const title = taskInput.value.trim();
+        if (!title) return;
+
+        state.tasks.unshift({
+          id: Date.now(),
+          title,
+          done: false
+        });
+        taskInput.value = "";
+        render();
+      });
+
+      render();
+    </script>
+  </body>
+</html>
